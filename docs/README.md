@@ -1,1 +1,1 @@
-"# Ligas Barriales - Documentaci¢n" 
+# Documentacion

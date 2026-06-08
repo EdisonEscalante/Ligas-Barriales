@@ -2,31 +2,43 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+/**
+ * Modelo User
+ * Representa a los usuarios del sistema (administradores, delegados, etc.)
+ * Extiende Authenticatable para manejar autenticación con Laravel
+ */
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    // HasUuids genera automáticamente un UUID como clave primaria
+    use HasUuids;
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Campos que se pueden llenar masivamente
+     * Solo estos campos se aceptan al crear o actualizar un usuario
      */
-    protected function casts(): array
+    protected $fillable = [
+        'nombre',
+        'email',
+        'password',
+    ];
+
+    /**
+     * Campos ocultos en las respuestas JSON
+     * El password nunca se expone en la API
+     */
+    protected $hidden = [
+        'password',
+    ];
+
+    /**
+     * Relación: un usuario puede tener varios roles
+     * Un usuario puede ser admin de liga, delegado de equipo, etc.
+     */
+    public function roles()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(UsuarioRol::class);
     }
 }

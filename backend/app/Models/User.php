@@ -4,16 +4,19 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * Modelo User
  * Representa a los usuarios del sistema (administradores, delegados, etc.)
  * Extiende Authenticatable para manejar autenticación con Laravel
+ * HasApiTokens permite generar tokens de acceso para la API REST
  */
 class User extends Authenticatable
 {
     // HasUuids genera automáticamente un UUID como clave primaria
-    use HasUuids;
+    // HasApiTokens permite crear y gestionar tokens de acceso a la API
+    use HasUuids, HasApiTokens;
 
     /**
      * Campos que se pueden llenar masivamente

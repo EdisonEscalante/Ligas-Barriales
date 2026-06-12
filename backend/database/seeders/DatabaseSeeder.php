@@ -2,24 +2,38 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Rol;
+use App\Models\UsuarioRol;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
-     * Seed the application's database.
+     * Crea los datos iniciales del sistema
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Ejecutamos el seeder de roles
+        $this->call(RolesSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Creamos el super administrador del sistema
+        $superAdmin = User::firstOrCreate(
+            ['email' => 'admin@ligasbarriales.com'],
+            [
+                'nombre'   => 'Super Administrador',
+                'email'    => 'admin@ligasbarriales.com',
+                'password' => Hash::make('admin12345'),
+            ]
+        );
+
+        // Asignamos el rol de super_admin
+        $rolSuperAdmin = Rol::where('nombre', 'super_admin')->first();
+
+        UsuarioRol::firstOrCreate([
+            'user_id' => $superAdmin->id,
+            'rol_id'  => $rolSuperAdmin->id,
         ]);
     }
 }

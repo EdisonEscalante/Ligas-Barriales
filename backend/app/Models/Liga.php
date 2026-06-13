@@ -16,6 +16,7 @@ class Liga extends Model
         'ciudad',
         'canton',
         'parroquia',
+        'barrio',
         'descripcion',
         'escudo_url',
     ];

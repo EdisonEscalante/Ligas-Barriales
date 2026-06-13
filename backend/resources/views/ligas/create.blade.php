@@ -11,7 +11,6 @@
 
     <div class="bg-white rounded-2xl shadow p-6">
 
-        {{-- Errores de validación --}}
         @if($errors->any())
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                 @foreach($errors->all() as $error)
@@ -20,8 +19,8 @@
             </div>
         @endif
 
-        {{-- Formulario crear liga --}}
-        <form action="/ligas" method="POST" class="space-y-4">
+        {{-- enctype necesario para subir archivos --}}
+        <form action="/ligas" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
 
             {{-- Nombre --}}
@@ -39,36 +38,19 @@
                     class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
-            {{-- Provincia y Ciudad --}}
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Provincia *</label>
-                    <input type="text" name="provincia" value="{{ old('provincia') }}"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Ej: Pichincha" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad *</label>
-                    <input type="text" name="ciudad" value="{{ old('ciudad') }}"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Ej: Quito" required>
-                </div>
-            </div>
+            {{-- Componente de ubicación encadenado --}}
+            <x-ubicacion
+                :provincia="old('provincia', '')"
+                :canton="old('canton', '')"
+                :parroquia="old('parroquia', '')"
+            />
 
-            {{-- Cantón y Parroquia --}}
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Cantón *</label>
-                    <input type="text" name="canton" value="{{ old('canton') }}"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Ej: Quito" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Parroquia *</label>
-                    <input type="text" name="parroquia" value="{{ old('parroquia') }}"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Ej: El Inca" required>
-                </div>
+            {{-- Barrio / Cooperativa --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Barrio / Cooperativa</label>
+                <input type="text" name="barrio" value="{{ old('barrio') }}"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ej: Barrio San Luis, Cooperativa La Unión">
             </div>
 
             {{-- Descripción --}}
@@ -79,12 +61,48 @@
                     placeholder="Descripción de la liga...">{{ old('descripcion') }}</textarea>
             </div>
 
-            {{-- Escudo URL --}}
+            {{-- Escudo desde PC --}}
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">URL del escudo</label>
-                <input type="text" name="escudo_url" value="{{ old('escudo_url') }}"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://...">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Escudo de la liga</label>
+                <div class="flex items-center gap-4">
+                    {{-- Vista previa de la imagen --}}
+                    <div id="preview-container" class="w-20 h-20 rounded-full border-2 border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden">
+                        <span id="preview-placeholder" class="text-3xl">🏆</span>
+                        <img id="preview-img" src="" alt="Escudo" class="hidden w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1">
+                        <input type="file" name="escudo" id="escudo" accept="image/*"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <p class="text-xs text-gray-400 mt-1">PNG, JPG o GIF. Máximo 2MB.</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Sección administrador --}}
+            <div class="border-t pt-4 mt-4">
+                <h3 class="text-lg font-semibold text-blue-800 mb-3">👤 Administrador de la Liga</h3>
+                <p class="text-sm text-gray-500 mb-4">Se creará un usuario administrador para gestionar esta liga.</p>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo *</label>
+                        <input type="text" name="admin_nombre" value="{{ old('admin_nombre') }}"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Nombre del administrador" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico *</label>
+                        <input type="email" name="admin_email" value="{{ old('admin_email') }}"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="correo@ejemplo.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña temporal *</label>
+                        <input type="password" name="admin_password"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Mínimo 8 caracteres" required>
+                    </div>
+                </div>
             </div>
 
             {{-- Botones --}}
@@ -101,4 +119,20 @@
         </form>
     </div>
 </div>
+
+{{-- Script para vista previa del escudo --}}
+<script>
+    document.getElementById('escudo').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-img').src = e.target.result;
+                document.getElementById('preview-img').classList.remove('hidden');
+                document.getElementById('preview-placeholder').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 @endsection

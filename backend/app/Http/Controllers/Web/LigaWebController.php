@@ -59,15 +59,15 @@ public function store(Request $request)
         $escudoPath = $request->file('escudo')->store('escudos', 'public');
     }
 
-    // Creamos la liga
+    // Creamos la liga normalizando las mayúsculas con ucwords
     $liga = Liga::create([
-        'nombre'          => $request->nombre,
+        'nombre'          => ucwords(strtolower($request->nombre)),
         'fecha_fundacion' => $request->fecha_fundacion,
-        'provincia'       => $request->provincia,
-        'ciudad'          => $request->canton,
-        'canton'          => $request->canton,
-        'parroquia'       => $request->parroquia,
-        'barrio'          => $request->barrio,
+        'provincia'       => ucwords(strtolower($request->provincia)),
+        'ciudad'          => ucwords(strtolower($request->canton)),
+        'canton'          => ucwords(strtolower($request->canton)),
+        'parroquia'       => ucwords(strtolower($request->parroquia)),
+        'barrio'          => $request->barrio ? ucwords(strtolower($request->barrio)) : null,
         'descripcion'     => $request->descripcion,
         'escudo_url'      => $escudoPath,
     ]);

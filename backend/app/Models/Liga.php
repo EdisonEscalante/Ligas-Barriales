@@ -40,4 +40,24 @@ class Liga extends Model
     {
         return $this->hasMany(Torneo::class);
     }
+
+    /**
+ * Obtiene el administrador de la liga
+ * Es el usuario con rol admin_liga asignado a esta liga
+ */
+public function administrador()
+{
+    return $this->hasOneThrough(
+        \App\Models\User::class,
+        \App\Models\UsuarioRol::class,
+        'liga_id',
+        'id',
+        'id',
+        'user_id'
+    )->whereHas('roles', function($q) {
+        $q->whereHas('rol', function($q2) {
+            $q2->where('nombre', 'admin_liga');
+        });
+    });
+}
 }

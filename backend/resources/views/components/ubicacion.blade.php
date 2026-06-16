@@ -1,9 +1,3 @@
-{{-- 
-    Componente reutilizable de ubicación para Ecuador
-    Uso: <x-ubicacion :provincia="$provincia" :canton="$canton" :parroquia="$parroquia" />
-    Los tres selectores son encadenados: provincia → cantón → parroquia
---}}
-
 @props([
     'provincia' => '',
     'canton'    => '',
@@ -37,14 +31,12 @@
     </select>
 </div>
 
-{{-- Script para cargar los datos encadenados --}}
 <script>
-    // Valores preseleccionados (para edición)
-    const valorProvincia = "{{ $provincia }}";
-    const valorCanton    = "{{ $canton }}";
-    const valorParroquia = "{{ $parroquia }}";
+    // Valores preseleccionados normalizados a mayúsculas para comparar
+    const valorProvincia = "{{ strtoupper($provincia) }}";
+    const valorCanton    = "{{ strtoupper($canton) }}";
+    const valorParroquia = "{{ strtoupper($parroquia) }}";
 
-    // Cargamos el JSON con las ubicaciones del Ecuador
     fetch('/js/ecuador.json')
         .then(res => res.json())
         .then(data => {
@@ -55,38 +47,45 @@
             // Cargamos las provincias
             Object.keys(data).sort().forEach(provincia => {
                 const opt = new Option(provincia, provincia);
-                if (provincia === valorProvincia) opt.selected = true;
+                // Comparamos en mayúsculas para que coincida sin importar el formato
+                if (provincia.toUpperCase() === valorProvincia) opt.selected = true;
                 selProvincia.add(opt);
             });
 
-            // Función para cargar cantones según provincia seleccionada
+            // Función para cargar cantones
             function cargarCantones(provincia, cantonSeleccionado = '') {
                 selCanton.innerHTML = '<option value="">Seleccione un cantón...</option>';
                 selParroquia.innerHTML = '<option value="">Seleccione una parroquia...</option>';
 
-                if (!provincia || !data[provincia]) return;
+                // Buscamos la provincia sin importar mayúsculas
+                const provinciaKey = Object.keys(data).find(p => p.toUpperCase() === provincia.toUpperCase());
+                if (!provinciaKey) return;
 
-                Object.keys(data[provincia]).sort().forEach(canton => {
+                Object.keys(data[provinciaKey]).sort().forEach(canton => {
                     const opt = new Option(canton, canton);
-                    if (canton === cantonSeleccionado) opt.selected = true;
+                    if (canton.toUpperCase() === cantonSeleccionado.toUpperCase()) opt.selected = true;
                     selCanton.add(opt);
                 });
             }
 
-            // Función para cargar parroquias según cantón seleccionado
+            // Función para cargar parroquias
             function cargarParroquias(provincia, canton, parroquiaSeleccionada = '') {
                 selParroquia.innerHTML = '<option value="">Seleccione una parroquia...</option>';
 
-                if (!provincia || !canton || !data[provincia] || !data[provincia][canton]) return;
+                const provinciaKey = Object.keys(data).find(p => p.toUpperCase() === provincia.toUpperCase());
+                if (!provinciaKey) return;
 
-                data[provincia][canton].sort().forEach(parroquia => {
+                const cantonKey = Object.keys(data[provinciaKey]).find(c => c.toUpperCase() === canton.toUpperCase());
+                if (!cantonKey) return;
+
+                data[provinciaKey][cantonKey].sort().forEach(parroquia => {
                     const opt = new Option(parroquia, parroquia);
-                    if (parroquia === parroquiaSeleccionada) opt.selected = true;
+                    if (parroquia.toUpperCase() === parroquiaSeleccionada.toUpperCase()) opt.selected = true;
                     selParroquia.add(opt);
                 });
             }
 
-            // Si hay valores preseleccionados (modo edición) los cargamos
+            // Si hay valores preseleccionados los cargamos
             if (valorProvincia) {
                 cargarCantones(valorProvincia, valorCanton);
                 if (valorCanton) {

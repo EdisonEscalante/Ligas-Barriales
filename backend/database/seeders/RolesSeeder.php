@@ -22,12 +22,16 @@ class RolesSeeder extends Seeder
                 'descripcion' => 'Administrador de una liga específica.',
             ],
             [
-                'nombre'      => 'admin_equipo',
-                'descripcion' => 'Administrador de un equipo dentro de una liga.',
+                'nombre'      => 'admin_equipos',
+                'descripcion' => 'Registra equipos y valida los jugadores ingresados por los delegados.',
             ],
             [
                 'nombre'      => 'calificador',
                 'descripcion' => 'Registra resultados y estadísticas de partidos.',
+            ],
+            [
+                'nombre'      => 'programador',
+                'descripcion' => 'Gestiona el calendario de fechas y encuentros.',
             ],
             [
                 'nombre'      => 'sancionador',
@@ -35,7 +39,7 @@ class RolesSeeder extends Seeder
             ],
             [
                 'nombre'      => 'delegado',
-                'descripcion' => 'Delegado de equipo, gestiona inscripciones de jugadores.',
+                'descripcion' => 'Presidente de equipo. Registra los jugadores de su equipo.',
             ],
         ];
 

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\AuthWebController;
 use App\Http\Controllers\Web\LigaWebController;
 use App\Http\Controllers\Web\MiLigaWebController;
+use App\Http\Controllers\Web\EquipoTrabajoWebController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,5 +38,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/mi-liga', [MiLigaWebController::class, 'show'])->name('mi-liga');
         Route::get('/mi-liga/edit', [MiLigaWebController::class, 'edit'])->name('mi-liga.edit');
         Route::put('/mi-liga', [MiLigaWebController::class, 'update'])->name('mi-liga.update');
+
+        // Equipo de trabajo (calificadores, programadores, sancionadores)
+        Route::get('/usuarios-liga', [EquipoTrabajoWebController::class, 'index'])->name('usuarios-liga.index');
+        Route::post('/usuarios-liga', [EquipoTrabajoWebController::class, 'store'])->name('usuarios-liga.store');
+        Route::delete('/usuarios-liga/{id}', [EquipoTrabajoWebController::class, 'destroy'])->name('usuarios-liga.destroy');
     });
 });
